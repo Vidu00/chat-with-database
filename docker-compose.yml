@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: banking_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: admin
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./BankingDB.sql:/docker-entrypoint-initdb.d/01-BankingDB.sql
+      - ./Chinook.sql:/docker-entrypoint-initdb.d/02-Chinook.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Streamlit App
+  streamlit:
+    build: .
+    container_name: banking_streamlit_app
+    ports:
+      - "8501:8501"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      - MYSQL_HOST=mysql
+      - MYSQL_PORT=3306
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=admin
+    volumes:
+      - .:/app
+
+volumes:
+  mysql_data:

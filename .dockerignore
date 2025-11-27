@@ -1,0 +1,12 @@
+venv/
+new_venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.git/
+.gitignore
+*.md
+.vscode/
+.idea/
+*.log
